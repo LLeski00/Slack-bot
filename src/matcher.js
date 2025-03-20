@@ -7,8 +7,6 @@ function getScoredItem(item, pattern) {
 }
 
 function getLikelyItems(items, pattern) {
-    console.log(items);
-
     const likelyItems = items
         .reduce((acc, item) => {
             const scoredItem = getScoredItem(item, pattern);

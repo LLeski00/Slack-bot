@@ -15,7 +15,6 @@ let botUserId;
 (async () => {
     const result = await app.client.auth.test();
     botUserId = result.user_id;
-    console.log(`Bot User ID: ${botUserId}`);
 })();
 
 app.message(async ({ message, say }) => {
@@ -29,7 +28,10 @@ app.message(async ({ message, say }) => {
 
         const items = await sheetsApi.getDataFromSheet();
         const likelyItems = matcher.getLikelyItems(items, userMessage);
-        const responseMessage = messageCreator.getResponseMessage(likelyItems);
+        const responseMessage = messageCreator.getResponseMessage(
+            likelyItems,
+            message.user
+        );
         await say(`${responseMessage}`);
     }
 });
