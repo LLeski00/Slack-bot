@@ -13,11 +13,17 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-async function getDataFromSheet() {
+let cachedData = null;
+
+async function refreshData() {
+    cachedData = await fetchDataFromSheet();
+}
+
+async function fetchDataFromSheet() {
     try {
         const authClient = await auth.getClient();
         const spreadsheetId = process.env.SPREADSHEET_ID;
-        const range = "List 1";
+        const range = process.env.SHEET_NAME;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -30,4 +36,9 @@ async function getDataFromSheet() {
     }
 }
 
-module.exports = { getDataFromSheet };
+async function getDataFromSheet() {
+    if (!cachedData) cachedData = await fetchDataFromSheet();
+    return cachedData;
+}
+
+module.exports = { getDataFromSheet, refreshData };
