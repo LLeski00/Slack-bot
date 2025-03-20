@@ -6,8 +6,19 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-app.message("hello", async ({ message, say }) => {
-    await say(`Hey there <@${message.user}>!`);
+let botUserId;
+
+(async () => {
+    const result = await app.client.auth.test();
+    botUserId = result.user_id;
+    console.log(`Bot User ID: ${botUserId}`);
+})();
+
+app.message(async ({ message, say }) => {
+    if (message.text && message.text.includes(`<@${botUserId}>`)) {
+        const userMessage = message.text.replace(`<@${botUserId}>`, "").trim();
+        await say(`You mentioned me! Your message: ${userMessage}`);
+    }
 });
 
 (async () => {
