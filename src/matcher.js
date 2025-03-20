@@ -1,19 +1,24 @@
 const fuzz = require("fuzzball");
+const { MIN_SCORE, MAX_ITEMS } = require("./config");
 
 function getScoredItem(item, pattern) {
-    const score = fuzz.partial_ratio(item[0], pattern);
-    console.log({ item, score });
+    const score = fuzz.ratio(item[0], pattern);
     return { item, score };
 }
 
 function getLikelyItems(items, pattern) {
-    const scoredItems = items
-        .map((item) => getScoredItem(item, pattern))
-        .filter((scoredItem) => scoredItem.score > 50)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3);
+    console.log(items);
 
-    return scoredItems;
+    const likelyItems = items
+        .reduce((acc, item) => {
+            const scoredItem = getScoredItem(item, pattern);
+            if (scoredItem.score >= MIN_SCORE) acc.push(scoredItem);
+            return acc;
+        }, [])
+        .sort((a, b) => b.score - a.score)
+        .slice(0, MAX_ITEMS);
+
+    return likelyItems;
 }
 
-module.exports = { getLikelyItems, getScoredItem };
+module.exports = { getLikelyItems };

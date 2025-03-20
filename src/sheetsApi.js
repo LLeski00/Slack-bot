@@ -11,7 +11,7 @@ const auth = new google.auth.GoogleAuth({
     scopes: SCOPES,
 });
 
-const sheets = google.sheets({ version: "v4" });
+const sheets = google.sheets({ version: "v4", auth });
 
 async function getDataFromSheet() {
     try {
@@ -23,16 +23,10 @@ async function getDataFromSheet() {
             range,
             auth: authClient,
         });
-        const data = response.data.values;
-        if (data.length) {
-            console.log("Data from the sheet:");
-            console.log(data);
-            return data;
-        } else {
-            console.log("No data found.");
-        }
+        return response.data.values ?? null;
     } catch (error) {
         console.error("Error fetching data from Google Sheets:", error);
+        return null;
     }
 }
 

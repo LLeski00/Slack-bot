@@ -3,6 +3,7 @@ const { App } = require("@slack/bolt");
 const sheetsApi = require("./sheetsApi");
 const matcher = require("./matcher");
 const messageCreator = require("./messageCreator");
+const { USAGE_MESSAGE } = require("./config");
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
@@ -20,6 +21,12 @@ let botUserId;
 app.message(async ({ message, say }) => {
     if (message.text && message.text.includes(`<@${botUserId}>`)) {
         const userMessage = message.text.replace(`<@${botUserId}>`, "").trim();
+
+        if (userMessage.length === 0) {
+            await say(`${USAGE_MESSAGE}`);
+            return;
+        }
+
         const items = await sheetsApi.getDataFromSheet();
         const likelyItems = matcher.getLikelyItems(items, userMessage);
         const responseMessage = messageCreator.getResponseMessage(likelyItems);
