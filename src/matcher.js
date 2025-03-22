@@ -2,6 +2,9 @@ const fuzz = require("fuzzball");
 const { MIN_SCORE, MAX_ITEMS } = require("./config");
 
 function getScoredItem(item, pattern) {
+    if (item.length === 0) {
+        return { item, score: 0 };
+    }
     const score = fuzz.ratio(item[0], pattern);
     return { item, score };
 }

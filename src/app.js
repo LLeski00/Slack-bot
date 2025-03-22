@@ -7,19 +7,21 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-let botUserId;
+let botUserId = null;
 
 (async () => {
-    const result = await app.client.auth.test();
-    botUserId = result.user_id;
+    try {
+        const result = await app.client.auth.test();
+        botUserId = result.user_id;
+        await app.start(process.env.PORT || 3000);
+        app.logger.info("⚡️ Bolt app is running!");
+    } catch (error) {
+        console.error("Error initializing Slack bot:", error);
+        process.exit(1);
+    }
 })();
 
 app.message(async ({ message, say }) => {
-    if (message.text && message.text.includes(`<@${botUserId}>`))
+    if (botUserId && message.text && message.text.includes(`<@${botUserId}>`))
         handleIncomingMessage(message, say, botUserId);
 });
-
-(async () => {
-    await app.start(process.env.PORT || 3000);
-    app.logger.info("⚡️ Bolt app is running!");
-})();
