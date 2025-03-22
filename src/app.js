@@ -9,10 +9,18 @@ const app = new App({
 
 let botUserId = null;
 
+async function getBotUserId() {
+    try {
+        const { user_id } = await app.client.auth.test();
+        botUserId = user_id;
+    } catch (error) {
+        console.error("Error fetching bot user ID:", error);
+    }
+}
+
 (async () => {
     try {
-        const result = await app.client.auth.test();
-        botUserId = result.user_id;
+        await getBotUserId();
         await app.start(process.env.PORT || 3000);
         app.logger.info("⚡️ Bolt app is running!");
     } catch (error) {
